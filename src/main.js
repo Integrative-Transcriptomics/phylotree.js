@@ -104,7 +104,7 @@ const parseString = require("xml2js").parseString;
         collapsible: true,
         "left-right-spacing": "fixed-step", //'fit-to-size',
         "top-bottom-spacing": "fixed-step",
-        "left-offset": 5,
+        "left-offset": 15,
         "show-scale": "top",
         // currently not implemented to support any other positioning
         "draw-size-bubbles": false,
@@ -2038,7 +2038,7 @@ const parseString = require("xml2js").parseString;
 
       enclosure.attr("transform", function (d) {
         return d3_phylotree_svg_translate([
-          offsets[1] + options["left-offset"],
+          offsets[1] + options["left-offset"] / 2,
           phylotree.pad_height() * 0,
         ]);
       });
