@@ -842,7 +842,7 @@ const parseString = require("xml2js").parseString;
           .select(self.container)
           .append("ul")
           .attr("id", d3_layout_phylotree_context_menu_id)
-          .attr("class", "dropdown-menu")
+          .attr("class", "dropdown-menu noselect")
           .attr("role", "menu");
       }
 
