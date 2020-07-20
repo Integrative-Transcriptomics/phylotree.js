@@ -2222,13 +2222,16 @@ const parseString = require("xml2js").parseString;
           phylotree.draw_node(this, d, transitions);
         });
 
+      d3.selectAll(".guides").attr("class", (node) => {
+        return `guides node-${node.clade ? node["show-name"] : node.name}`;
+      });
+
       if (options["label-nodes-with-name"]) {
         drawn_nodes.attr("id", function (d) {
           return "node-" + d.name;
         });
       }
       drawn_nodes.selectAll("text").text((d) => node_label(d));
-      // drawn_nodes.selectAll("text").text((d) => "");
 
       var sizes = d3_phylotree_resize_svg(phylotree, svg, transitions);
 
@@ -2512,7 +2515,9 @@ const parseString = require("xml2js").parseString;
         tracers
           .enter()
           .append("line")
-          .attr("class", (node) => `guides node-${node.clade ? node["show-name"] : node.name}`);
+          .attr("class", (node) => {
+            return `guides`;
+          });
 
         tracers.exit().remove();
         tracers
