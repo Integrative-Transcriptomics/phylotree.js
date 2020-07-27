@@ -2222,16 +2222,15 @@ const parseString = require("xml2js").parseString;
           phylotree.draw_node(this, d, transitions);
         });
 
-      d3.selectAll(".guides").attr("class", (node) => {
-        return `guides node-${node.clade ? node["show-name"] : node.name}`;
-      });
-
       if (options["label-nodes-with-name"]) {
         drawn_nodes.attr("id", function (d) {
           return "node-" + d.name;
         });
       }
       drawn_nodes.selectAll("text").text((d) => node_label(d));
+      drawn_nodes.selectAll(".guides").attr("class", (node) => {
+        return `guides node-${node["own-collapse"] ? node["show-name"] : node.name}`;
+      });
 
       var sizes = d3_phylotree_resize_svg(phylotree, svg, transitions);
 
