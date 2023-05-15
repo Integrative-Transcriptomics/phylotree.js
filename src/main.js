@@ -1,4 +1,4 @@
-const parseString = require("xml2js").parseString;
+//const parseString = require("xml2js").parseString;phylo_attr
 // const _ = require("underscore");
 // const d3 = require("d3")
 (function () {
@@ -105,7 +105,7 @@ const parseString = require("xml2js").parseString;
         "left-right-spacing": "fixed-step", //'fit-to-size',
         "top-bottom-spacing": "fixed-step",
         "left-offset": 15,
-        "show-scale": "top",
+        "show-scale": "", //"top",
         // currently not implemented to support any other positioning
         "draw-size-bubbles": false,
         "binary-selectable": false,
@@ -143,10 +143,12 @@ const parseString = require("xml2js").parseString;
         "branch-tracer": "branch-tracer",
         clade: "clade",
       },
+      max_depth_tree = 0;
       nodes = [],
       links = [],
       parsed_tags = [],
       partitions = [],
+      leaves={},
       x_coord = function (d) {
         return d.y;
       },
@@ -387,12 +389,10 @@ const parseString = require("xml2js").parseString;
             process_internal_node(a_node);
           }
         }
-
         return a_node.x;
       }
 
-      rescale_node_span =
-        nodes
+      rescale_node_span = nodes
           .map(function (d) {
             return node_span(d);
           })
@@ -738,6 +738,17 @@ const parseString = require("xml2js").parseString;
         });
         parsed_tags = Object.keys(_parsed_tags);
       }
+      //! me added
+      nodes.forEach(function(node){
+        if(node.depth > max_depth_tree){
+          max_depth_tree = node.depth;
+        }
+        if(d3_phylotree_is_leafnode(node)){
+          leaves[node.name]=node;
+        }
+
+      });
+
 
       phylotree.placenodes();
       links = phylotree.links(nodes);
@@ -801,17 +812,6 @@ const parseString = require("xml2js").parseString;
       }
       recurse_d(n);
       return desc;
-    };
-
-    /**
-     * Collapses a given node.
-     *
-     * @param {Node} node A node to be collapsed.
-     */
-    phylotree.collapse_node = function (n) {
-      if (!d3_phylotree_is_node_collapsed(n)) {
-        n.collapsed = true;
-      }
     };
 
     phylotree.separation = function (attr) {
@@ -919,26 +919,51 @@ const parseString = require("xml2js").parseString;
                   );
                 });
             }
+            
+            //! me added
+            menu_object
+              .append("li")
+              .append("a")
+              .attr("tabindex", "-1")
+              .text("Show this subtree")
+              .on("click", function (d) {
+                var selection = phylotree.select_all_descendants(node, true, true);
+                console.log(selection)
 
-            // menu_object
-            //   .append("li")
-            //   .append("a")
-            //   .attr("tabindex", "-1")
-            //   .text("All terminal branches")
-            //   .on("click", function (d) {
-            //     menu_object.style("display", "none");
-            //     phylotree.modify_selection(phylotree.select_all_descendants(node, true, false));
-            //   });
+              });
 
-            // menu_object
-            //   .append("li")
-            //   .append("a")
-            //   .attr("tabindex", "-1")
-            //   .text("All internal branches")
-            //   .on("click", function (d) {
-            //     menu_object.style("display", "none");
-            //     phylotree.modify_selection(phylotree.select_all_descendants(node, false, true));
-            //   });
+            menu_object
+              .append("li")
+              .append("a")
+              .attr("tabindex", "-1")
+              .text("All terminal branches")
+              .on("click", function (d) {
+                menu_object.style("display", "none");
+                phylotree.modify_selection(phylotree.select_all_descendants(node, true, false));
+              });
+
+            menu_object
+              .append("li")
+              .append("a")
+              .attr("tabindex", "-1")
+              .text("All internal branches")
+              .on("click", function (d) {
+                menu_object.style("display", "none");
+                phylotree.modify_selection(phylotree.select_all_descendants(node, false, true));
+              });
+
+              menu_object
+              .append("li")
+              .append("a")
+              .attr("tabindex", "-1")
+              .text("All internal branches")
+              .on("click", function (d) {
+                menu_object.style("display", "none");
+                phylotree.modify_selection(phylotree.select_all_descendants(node, false, true));
+              });
+
+
+          
           }
         }
 
@@ -957,15 +982,15 @@ const parseString = require("xml2js").parseString;
                 phylotree.modify_selection([node]);
               });
 
-            // menu_object
-            //   .append("li")
-            //   .append("a")
-            //   .attr("tabindex", "-1")
-            //   .text("Path to root")
-            //   .on("click", function (d) {
-            //     menu_object.style("display", "none");
-            //     phylotree.modify_selection(phylotree.path_to_root(node));
-            //   });
+            menu_object
+              .append("li")
+              .append("a")
+              .attr("tabindex", "-1")
+              .text("Path to root")
+              .on("click", function (d) {
+                menu_object.style("display", "none");
+                phylotree.modify_selection(phylotree.path_to_root(node));
+              });
 
             if (options["reroot"] || options["hide"]) {
               menu_object.append("li").attr("class", "divider");
@@ -1831,6 +1856,41 @@ const parseString = require("xml2js").parseString;
       return phylotree;
     };
 
+        /**
+     * Collapses a given node.
+     *
+     * @param {Node} node A node to be collapsed.
+     */
+    phylotree.collapse_node = function (node) {
+      if (!d3_phylotree_is_node_collapsed(node)) {
+        node.collapsed = true;
+      }
+      phylotree.placenodes();
+      return phylotree;
+    };
+
+    //! i made this
+    phylotree.expand_node = function (node) {
+      if (d3_phylotree_is_node_collapsed(node)) {
+        node.collapsed = false;
+
+        var unhide = function (n) {
+          if (!d3_phylotree_is_leafnode(n)) {
+            if (!n.collapsed) {
+              n.children.forEach(unhide);
+            }
+          }
+          n.hidden = false;
+        };
+        unhide(node);
+      }
+      phylotree.placenodes();
+      return phylotree;
+    };
+  
+
+
+
     phylotree.update_has_hidden_nodes = function () {
       for (k = nodes.length - 1; k >= 0; k -= 1) {
         if (d3_phylotree_is_leafnode(nodes[k])) {
@@ -2488,7 +2548,6 @@ const parseString = require("xml2js").parseString;
     };
     phylotree.draw_node = function (container, node, transitions) {
       container = d3.select(container);
-
       if (d3_phylotree_is_leafnode(node)) {
         var labels = container.selectAll("text").data([node]),
           tracers = container.selectAll("line").data([node]);
@@ -2696,6 +2755,12 @@ const parseString = require("xml2js").parseString;
     phylotree.get_nodes = function () {
       return nodes;
     };
+    phylotree.get_leaves = function () {
+      return leaves;
+    };
+    phylotree.get_max_depth_of_tree = function(){
+      return max_depth_tree;
+    }
 
     /**
      * Get a node by name.
@@ -2761,6 +2826,60 @@ const parseString = require("xml2js").parseString;
     phylotree.nodes = phylotree;
     phylotree.links = d3.layout.cluster().links;
 
+    //! I did This
+
+    phylotree.collapse_node_by_depth = function(mode, depth){
+      var node_with_most_children = [];
+      var maxdepth = 0;
+      
+
+      nodes.forEach(function(node){
+        if(node.depth > maxdepth){
+          maxdepth = node.depth;
+        }
+      })
+      
+      var filter =maxdepth/depth;
+    
+      nodes.forEach(function(node){
+        if(!d3_phylotree_is_leafnode(node) && node.name!="root"){
+          if(node.depth > filter){
+            node_with_most_children.push(node);                
+          }
+        }
+      });
+      if(mode == "expand"){
+        node_with_most_children.forEach(function(n){
+            phylotree.expand_node(n);
+        });
+      }
+      if (mode == "collapse") {
+        node_with_most_children.forEach(function(n){
+            phylotree.collapse_node(n);
+        });
+      }
+    }
+
+    //! I made this: return LCA
+    phylotree.get_lca = function(list_of_nodenames){
+
+      var paths_to_root = [];
+      list_of_nodenames.forEach(function(node_name){
+        if(node_name in leaves){
+          var path = phylotree.path_to_root(leaves[node_name]);
+          paths_to_root.push(path);
+        }
+   
+      });
+      //console.log(Object.keys(leaves).length);
+      if(paths_to_root.length !== 0){
+        var shared_ancestors = paths_to_root.reduce((a, b) => a.filter(c => b.includes(c)));
+        return shared_ancestors[0]; 
+      }
+      else return undefined;
+      
+    
+  }
     return phylotree;
   };
 
