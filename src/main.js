@@ -2565,7 +2565,7 @@
         console.log(container);
         tracers
           .attr("x1", labels.node().getBBox().width + 2)
-          .attr("x2", 5000)
+          .attr("x2", container.node().getBBox().width)
           .attr("y1", 0)
           .attr("y2", 0)
           .style("stroke", "grey")
