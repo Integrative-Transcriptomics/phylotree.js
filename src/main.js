@@ -2565,12 +2565,9 @@ const { max } = require("lodash");
           });
 
         tracers.exit().remove();
+        // Get max width of screen to put max for guidelines
+        max_width_tree = document.body.clientWidth;
 
-        // Get max width of tree
-        max_width_tree = svg
-          .selectAll("." + css_classes["tree-container"])
-          .node()
-          .getBBox().width;
         tracers
           .attr("x1", labels.node().getBBox().width + 2)
           .attr("x2", max_width_tree)
