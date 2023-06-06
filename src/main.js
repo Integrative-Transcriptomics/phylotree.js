@@ -144,23 +144,23 @@
         clade: "clade",
       },
       max_depth_tree = 0;
-      nodes = [],
-      links = [],
-      parsed_tags = [],
-      partitions = [],
-      leaves={},
-      x_coord = function (d) {
+    (nodes = []),
+      (links = []),
+      (parsed_tags = []),
+      (partitions = []),
+      (leaves = {}),
+      (x_coord = function (d) {
         return d.y;
-      },
-      y_coord = function (d) {
+      }),
+      (y_coord = function (d) {
         return d.x;
-      },
-      scales = [1, 1],
-      fixed_width = [15, 20],
-      font_size = 12,
-      scale_bar_font_size = 12,
-      offsets = [0, font_size / 2],
-      draw_line = d3.svg
+      }),
+      (scales = [1, 1]),
+      (fixed_width = [15, 20]),
+      (font_size = 12),
+      (scale_bar_font_size = 12),
+      (offsets = [0, font_size / 2]),
+      (draw_line = d3.svg
         .line()
         .x(function (d) {
           return x_coord(d);
@@ -168,11 +168,11 @@
         .y(function (d) {
           return y_coord(d);
         })
-        .interpolate("step-before"),
-      ensure_size_is_in_px = function (value) {
+        .interpolate("step-before")),
+      (ensure_size_is_in_px = function (value) {
         return typeof value === "number" ? value + "px" : value;
-      },
-      draw_arc = function (points) {
+      }),
+      (draw_arc = function (points) {
         var start = radial_mapper(points[0].radius, points[0].angle),
           end = radial_mapper(points[0].radius, points[1].angle);
 
@@ -196,7 +196,7 @@
           "," +
           y_coord(points[1])
         );
-      };
+      });
 
     (draw_branch = draw_line),
       (draw_scale_bar = null),
@@ -392,7 +392,8 @@
         return a_node.x;
       }
 
-      rescale_node_span = nodes
+      rescale_node_span =
+        nodes
           .map(function (d) {
             return node_span(d);
           })
@@ -738,17 +739,16 @@
         });
         parsed_tags = Object.keys(_parsed_tags);
       }
-      //! me added
-      nodes.forEach(function(node){
-        if(node.depth > max_depth_tree){
+      // Save the max depth of the tree after iterating over all nodes
+      nodes.forEach(function (node) {
+        if (node.depth > max_depth_tree) {
           max_depth_tree = node.depth;
         }
-        if(d3_phylotree_is_leafnode(node)){
-          leaves[node.name]=node;
+        // Save the name of the node in the node name map
+        if (d3_phylotree_is_leafnode(node)) {
+          leaves[node.name] = node;
         }
-
       });
-
 
       phylotree.placenodes();
       links = phylotree.links(nodes);
@@ -919,18 +919,18 @@
                   );
                 });
             }
-            
-            //! me added
-            menu_object
-              .append("li")
-              .append("a")
-              .attr("tabindex", "-1")
-              .text("Show this subtree")
-              .on("click", function (d) {
-                var selection = phylotree.select_all_descendants(node, true, true);
-                console.log(selection)
 
-              });
+            // Added by Dolores
+            // Selects the subree of the node
+            //! Comented out since no real function seems to be implemented
+            // menu_object
+            //   .append("li")
+            //   .append("a")
+            //   .attr("tabindex", "-1")
+            //   .text("Select this subtree")
+            //   .on("click", function (d) {
+            //     phylotree.select_all_descendants(node, true, true);
+            //   });
 
             menu_object
               .append("li")
@@ -951,19 +951,6 @@
                 menu_object.style("display", "none");
                 phylotree.modify_selection(phylotree.select_all_descendants(node, false, true));
               });
-
-              menu_object
-              .append("li")
-              .append("a")
-              .attr("tabindex", "-1")
-              .text("All internal branches")
-              .on("click", function (d) {
-                menu_object.style("display", "none");
-                phylotree.modify_selection(phylotree.select_all_descendants(node, false, true));
-              });
-
-
-          
           }
         }
 
@@ -1026,7 +1013,7 @@
         }
 
         if (false && d3_phylotree_has_hidden_nodes(node)) {
-          // HERE IS A SELF-CHANGE
+          // Modified to not show the option to show all descendants
           menu_object
             .append("li")
             .append("a")
@@ -1856,7 +1843,7 @@
       return phylotree;
     };
 
-        /**
+    /**
      * Collapses a given node.
      *
      * @param {Node} node A node to be collapsed.
@@ -1869,7 +1856,7 @@
       return phylotree;
     };
 
-    //! i made this
+    // expand a complete clade
     phylotree.expand_node = function (node) {
       if (d3_phylotree_is_node_collapsed(node)) {
         node.collapsed = false;
@@ -1887,9 +1874,6 @@
       phylotree.placenodes();
       return phylotree;
     };
-  
-
-
 
     phylotree.update_has_hidden_nodes = function () {
       for (k = nodes.length - 1; k >= 0; k -= 1) {
@@ -2569,7 +2553,7 @@
           .style("font-size", function (d) {
             return ensure_size_is_in_px(shown_font_size);
           });
-        // HERE IS A CHANGE
+        // Adding guide lines for better alignment of elements
         tracers
           .enter()
           .append("line")
@@ -2578,6 +2562,7 @@
           });
 
         tracers.exit().remove();
+        console.log(container);
         tracers
           .attr("x1", labels.node().getBBox().width + 2)
           .attr("x2", 5000)
@@ -2758,9 +2743,9 @@
     phylotree.get_leaves = function () {
       return leaves;
     };
-    phylotree.get_max_depth_of_tree = function(){
+    phylotree.get_max_depth_of_tree = function () {
       return max_depth_tree;
-    }
+    };
 
     /**
      * Get a node by name.
@@ -2826,60 +2811,60 @@
     phylotree.nodes = phylotree;
     phylotree.links = d3.layout.cluster().links;
 
-    //! I did This
+    /***
+     *      Allows the user to collapse a node depending on their depth
+     */
 
-    phylotree.collapse_node_by_depth = function(mode, depth){
+    phylotree.collapse_node_by_depth = function (mode, depth) {
       var node_with_most_children = [];
       var maxdepth = 0;
-      
 
-      nodes.forEach(function(node){
-        if(node.depth > maxdepth){
+      nodes.forEach(function (node) {
+        if (node.depth > maxdepth) {
           maxdepth = node.depth;
         }
-      })
-      
-      var filter =maxdepth/depth;
-    
-      nodes.forEach(function(node){
-        if(!d3_phylotree_is_leafnode(node) && node.name!="root"){
-          if(node.depth > filter){
-            node_with_most_children.push(node);                
+      });
+
+      var filter = maxdepth / depth;
+
+      nodes.forEach(function (node) {
+        if (!d3_phylotree_is_leafnode(node) && node.name != "root") {
+          if (node.depth > filter) {
+            node_with_most_children.push(node);
           }
         }
       });
-      if(mode == "expand"){
-        node_with_most_children.forEach(function(n){
-            phylotree.expand_node(n);
+      if (mode == "expand") {
+        node_with_most_children.forEach(function (n) {
+          phylotree.expand_node(n);
         });
       }
       if (mode == "collapse") {
-        node_with_most_children.forEach(function(n){
-            phylotree.collapse_node(n);
+        node_with_most_children.forEach(function (n) {
+          phylotree.collapse_node(n);
         });
       }
-    }
+    };
 
-    //! I made this: return LCA
-    phylotree.get_lca = function(list_of_nodenames){
-
+    /**
+     * Get LCA of a list of nodes.
+     *
+     * @param {Array} list_of_nodenames
+     * @returns
+     */
+    phylotree.get_lca = function (list_of_nodenames) {
       var paths_to_root = [];
-      list_of_nodenames.forEach(function(node_name){
-        if(node_name in leaves){
+      list_of_nodenames.forEach(function (node_name) {
+        if (node_name in leaves) {
           var path = phylotree.path_to_root(leaves[node_name]);
           paths_to_root.push(path);
         }
-   
       });
-      //console.log(Object.keys(leaves).length);
-      if(paths_to_root.length !== 0){
-        var shared_ancestors = paths_to_root.reduce((a, b) => a.filter(c => b.includes(c)));
-        return shared_ancestors[0]; 
-      }
-      else return undefined;
-      
-    
-  }
+      if (paths_to_root.length !== 0) {
+        var shared_ancestors = paths_to_root.reduce((a, b) => a.filter((c) => b.includes(c)));
+        return shared_ancestors[0];
+      } else return undefined;
+    };
     return phylotree;
   };
 
@@ -3338,4 +3323,4 @@
     });
     return trees;
   };
-}.call(this));
+}).call(this);
