@@ -1,5 +1,8 @@
 //const parseString = require("xml2js").parseString;phylo_attr
 // const _ = require("underscore");
+
+const { max } = require("lodash");
+
 // const d3 = require("d3")
 (function () {
   var d3_layout_phylotree_event_id = "d3.layout.phylotree.event",
@@ -2562,10 +2565,15 @@
           });
 
         tracers.exit().remove();
-        console.log(container);
+
+        // Get max width of tree
+        max_width_tree = svg
+          .selectAll("." + css_classes["tree-container"])
+          .node()
+          .getBBox().width;
         tracers
           .attr("x1", labels.node().getBBox().width + 2)
-          .attr("x2", container.getBBox().width)
+          .attr("x2", max_width_tree)
           .attr("y1", 0)
           .attr("y2", 0)
           .style("stroke", "grey")
@@ -2675,7 +2683,7 @@
           tracers = container.selectAll("line").data([node]);
         radius = phylotree.node_circle_size()(node);
         if (node["own-collapse"]) {
-          // Here is a change!
+          // Redo nodes after own collapse
 
           labels // Add new labels if necessary
             .enter()
@@ -2691,7 +2699,7 @@
             })
             .style("font-size", () => ensure_size_is_in_px(shown_font_size));
 
-          // HERE IS A CHANGE
+          // Adding lines for nodes after collapse
           tracers
             .enter()
             .append("line")
@@ -2700,7 +2708,7 @@
           tracers.exit().remove();
           tracers
             .attr("x1", labels.node().getBBox().width + 2)
-            .attr("x2", 5000)
+            .attr("x2", max_width_tree)
             .attr("y1", 0)
             .attr("y2", 0)
             .style("stroke", "grey")
