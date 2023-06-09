@@ -2860,10 +2860,10 @@ const { max } = require("lodash");
     phylotree.get_lca = function (list_of_nodenames) {
       var paths_to_root = [];
       list_of_nodenames.forEach(function (node_name) {
-        if (node_name in leaves) {
-          var path = phylotree.path_to_root(leaves[node_name]);
-          paths_to_root.push(path);
-        }
+        let all_nodes = phylotree.get_nodes();
+        let to_collapse = all_nodes.filter((node) => node.name === node_name);
+        var path = phylotree.path_to_root(to_collapse[0]);
+        paths_to_root.push(path);
       });
       if (paths_to_root.length !== 0) {
         var shared_ancestors = paths_to_root.reduce((a, b) => a.filter((c) => b.includes(c)));
